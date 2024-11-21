@@ -1,0 +1,532 @@
+                                                Assignment 1 
+..................................................................................................................................
+
+import java.math.BigInteger;
+import java.util.*;
+public class temp1
+{
+    static BigInteger divid(String a)
+    {
+        int start=0;
+        int end=a.length()-1;
+    
+    if(start==end)
+    {
+        return new BigInteger(a).pow(2);
+    }
+    int mid =(start + end)/2;
+
+    BigInteger left, right;
+
+    String s1 =a.substring(0, mid+1);
+    left = divid(s1);
+
+    String s2 = a.substring(mid+1,end+1);
+    right =divid(s2);
+
+    int length = Math.min(s1.length(),s2.length());
+    BigInteger pow1 = BigInteger.TEN.pow(length*2);
+    BigInteger pow2 =BigInteger.TEN.pow(length);
+
+    BigInteger multipy = pow1.multiply(left).add(right).add(pow2.multiply(new BigInteger(s1)).multiply(new BigInteger(s2)).multiply(BigInteger.TWO));
+    return multipy;
+}
+public static void main(String[] args) {
+    Scanner s = new Scanner(System.in);
+    System.out.println("enter a large no");
+    String num =s.nextLine();
+    System.out.println("number"+num);
+    System.out.println("square"+divid(num));
+    s.close();
+}
+
+}
+
+
+
+
+
+.......................................................................................................................................................................
+
+Assignmet 2
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Scanner;
+
+public class a2
+{
+    public static void main(String[] args) 
+    {
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("Enter the number of tasks: ");
+        int n = sc.nextInt();
+
+        //declare an array of task objects
+        ArrayList<Task> tasks = new ArrayList<>();
+
+        //take user input for each task
+        for (int i = 0; i < n; i++) 
+        {
+            System.out.print("Enter profit for task " + (i + 1) + ": ");
+            int profit = sc.nextInt();
+            System.out.print("Enter deadline for task " + (i + 1) + ": ");
+            int deadline = sc.nextInt();
+            tasks.add(new Task(profit, deadline));
+        }
+
+        // Find the maximum deadline
+        int maxDeadline = 0;
+        for (Task task : tasks) 
+        {
+            maxDeadline = Math.max(maxDeadline, task.deadline);
+        }
+
+        // Sort tasks based on profit in descending order
+        Collections.sort(tasks, new Comparator<Task>() 
+        {
+            @Override
+            public int compare(Task t1, Task t2)    
+            {
+                return t2.profit - t1.profit;
+            }
+        }
+        );
+
+        // Create a schedule array to keep track of which slots are filled
+        int[] schedule = new int[maxDeadline];
+        for (int i = 0; i < maxDeadline; i++) 
+        {
+            schedule[i] = -1; // Initialize all slots to -1 (empty)
+        }
+
+        // Schedule tasks to maximize profit
+        for (Task task : tasks) 
+        {
+            for (int j = Math.min(maxDeadline - 1, task.deadline - 1); j >= 0; j--) 
+            {
+                if (schedule[j] == -1) 
+                {
+                    schedule[j] = task.profit;
+                    break;
+                }
+            }
+        }
+
+        // Calculate and print the total profit
+        int totalProfit = 0;
+        System.out.println("Scheduled tasks:");
+        for (int i = 0; i < schedule.length; i++) 
+        {
+            if (schedule[i] != -1) 
+            {
+                System.out.println("Slot " + (i + 1) + ": Profit " + schedule[i]);
+                totalProfit += schedule[i];
+            }
+        }
+        System.out.println("Total Profit: " + totalProfit);
+    }
+}
+    //create a class Task with properties profit and deadline
+    class Task 
+    {
+        int profit;
+        int deadline;
+
+        public Task(int profit, int deadline) 
+        {
+            this.profit = profit;
+            this.deadline = deadline;
+        }
+}
+
+
+
+.............................................................................................................................................................
+
+Assignment 3
+
+
+import java.util.Scanner;
+
+public class a3 {
+    static final int INF = 99999; // Represents infinity
+
+    // Function to implement the Floyd-Warshall algorithm
+    static void floydWarshall(int graph[][], int V) {
+        int dist[][] = new int[V][V];
+
+        // Initialize the solution matrix same as the input graph matrix
+        for (int i = 0; i < V; i++) {
+            for (int j = 0; j < V; j++) {
+                dist[i][j] = graph[i][j];
+            }
+        }
+
+        // Add all vertices one by one to the set of intermediate vertices
+        for (int k = 0; k < V; k++) {
+            // Pick all vertices as source
+            for (int i = 0; i < V; i++) {
+                // Pick all vertices as destination
+                for (int j = 0; j < V; j++) {
+                    // If vertex k is on the shortest path from i to j, update dist[i][j]
+                    if (dist[i][k] + dist[k][j] < dist[i][j]) {
+                        dist[i][j] = dist[i][k] + dist[k][j];
+                    }
+                }
+            }
+        }
+
+        // Print the shortest distances matrix
+        printSolution(dist, V);
+    }
+
+    // Function to print the solution
+    static void printSolution(int dist[][], int V) {
+        System.out.println("The shortest distances between every pair of vertices:");
+        for (int i = 0; i < V; i++) {
+            for (int j = 0; j < V; j++) {
+                if (dist[i][j] == INF) {
+                    System.out.print("INF ");
+                } else {
+                    System.out.print(dist[i][j] + " ");
+                }
+            }
+            System.out.println();
+        }
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        // Number of offices (vertices)
+        System.out.print("Enter the number of offices (vertices): ");
+        int V = sc.nextInt();
+
+        // Input the adjacency matrix
+        int[][] graph = new int[V][V];
+        System.out.println("Enter the cost matrix (enter " + INF + " for no direct connection):");
+        for (int i = 0; i < V; i++) {
+            for (int j = 0; j < V; j++) {
+                graph[i][j] = sc.nextInt();
+            }
+        }
+
+        // Execute the Floyd-Warshall algorithm
+        floydWarshall(graph, V);
+
+        sc.close();
+    }
+}
+
+
+
+................................................................................................................................................
+
+
+Assignemt 4
+
+
+import java.util.*;
+public class a4 {
+        static void dijkstra(int[][] network, int src, int n) 
+        {
+            int[] vis = new int[n];
+            int[] dist = new int[n];
+            src--;
+            for (int i = 0; i < n; i++) 
+            {
+                vis[i] = 0;
+                dist[i] = Integer.MAX_VALUE;
+            }
+            dist[src] = 0;
+            for (int c = 0; c < n; c++) 
+            {
+                int u = -1;
+                int min = Integer.MAX_VALUE;
+                for (int i = 0; i < n; i++) 
+                {
+                    if (vis[i] == 0 && dist[i] < min) 
+                    {
+                        u = i;
+                        min = dist[i];
+                    }
+                }
+                vis[u] = 1;
+                for (int v = 0; v < n; v++) 
+                {
+                    if (dist[u] + network[u][v] < dist[v] && vis[v] == 0 && network[u][v] != 0) 
+                    {
+                        dist[v] = dist[u] + network[u][v];
+                    }
+                }
+            }
+            System.out.println("Time taken from node " + (src + 1) + " to all nodes : ");
+            for (int i = 0; i < n; i++) 
+            {
+                if (dist[i] == Integer.MAX_VALUE) 
+                {
+                    System.out.println(i + 1 + " : -1");
+                } 
+                else 
+                {
+                    System.out.println(i + 1 + " : " + dist[i]);
+                }
+            }
+        }
+        public static void main(String[] args) 
+        {
+            Scanner sc = new Scanner(System.in);
+            System.out.print("Enter the number of nodes : ");
+            int n = sc.nextInt();
+            System.out.print("Enter the number of edges : ");
+            int m = sc.nextInt();
+            int[][] network = new int[n][n];
+            for (int i = 0; i < n; i++) 
+            {
+                for (int j = 0; j < n; j++) 
+                {
+                    network[i][j] = 0;
+                }
+            }
+            for (int i = 0; i < m; i++) 
+            {
+                int u, v, w;
+                System.out.print("Enter source : ");
+                u = sc.nextInt();
+                System.out.print("Enter destination : ");
+                v = sc.nextInt();
+                System.out.print("Enter time taken : ");
+                w = sc.nextInt();
+                System.out.println();
+                if (u > n && v > n && w < 0 && u < 1 && v < 1) 
+                {
+                    i--;
+                    System.out.println("Enter correct source, destination and time taken");
+                } 
+                else if (network[u - 1][v - 1] != 0) 
+                {
+                    System.out.println("Edge already present");
+                } 
+                else 
+                {
+                    network[u - 1][v - 1] = w;
+                    network[v - 1][u - 1] = w;
+                }
+            }
+            System.out.println("Enter starting source : ");
+            int src = sc.nextInt();
+            System.out.println();
+            System.out.println("Distance matrix : ");
+            for (int i = 0; i < n; i++) 
+            {
+                for (int j = 0; j < n; j++) 
+                {
+                    System.out.print(network[i][j] + " ");
+                }
+                System.out.println();
+            }
+            System.out.println();
+            dijkstra(network, src, n);
+        }
+}
+
+
+..........................................................................................................................................................
+
+Assignment 5
+
+import java.util.Scanner;
+
+class a5 {
+    // A recursive utility function to solve Knight's Tour problem
+    static boolean explore(int x, int y, int count, int board[][], int xMove[], int yMove[], int N) {
+        int k, nx, ny;
+        if (count == N * N) // All squares are visited
+            return true;
+
+        // Try all next moves from the current coordinate (x, y)
+        for (k = 0; k < 8; k++) {
+            nx = x + xMove[k];
+            ny = y + yMove[k];
+            if (isSafe(nx, ny, board, N)) {
+                board[nx][ny] = count; // Mark the move
+                if (explore(nx, ny, count + 1, board, xMove, yMove, N)) // Recursive call
+                    return true;
+                else
+                    board[nx][ny] = -1; // Backtrack
+            }
+        }
+        return false;
+    }
+
+    // A utility function to check if x, y are valid indexes for N*N chessboard
+    static boolean isSafe(int x, int y, int board[][], int N) {
+        return (x >= 0 && x < N && y >= 0 && y < N && board[x][y] == -1);
+    }
+
+    public static void main(String args[]) {
+        Scanner sc = new Scanner(System.in);
+
+        // Enter size of the board
+        System.out.print("Enter value of N (board size): ");
+        int N = sc.nextInt();
+
+        // Validate board size
+        if (N <= 0) {
+            System.out.println("Invalid board size! N must be greater than 0.");
+            sc.close();
+            return;
+        }
+
+        // Enter starting coordinates of the knight
+        System.out.print("Enter starting coordinates (x y): ");
+        int sx = sc.nextInt();
+        int sy = sc.nextInt();
+
+        // Validate starting coordinates
+        if (sx < 0 || sx >= N || sy < 0 || sy >= N) {
+            System.out.println("Invalid starting coordinates! They must be within the board's range (0 to " + (N - 1) + ").");
+            sc.close();
+            return;
+        }
+
+        // NxN chessboard declared
+        int board[][] = new int[N][N];
+
+        // Initialization of board
+        for (int x = 0; x < N; x++)
+            for (int y = 0; y < N; y++)
+                board[x][y] = -1;
+
+        // xMove[] and yMove[] define the next moves of the knight
+        int xMove[] = {2, 1, -1, -2, -2, -1, 1, 2};
+        int yMove[] = {1, 2, 2, 1, -1, -2, -2, -1};
+
+        // Knight is initially at the starting position
+        board[sx][sy] = 0;
+
+        // Start exploring
+        if (!explore(sx, sy, 1, board, xMove, yMove, N)) {
+            System.out.println("Solution does not exist.");
+        } else {
+            System.out.println("Knight's Tour solution:");
+            for (int x = 0; x < N; x++) {
+                for (int y = 0; y < N; y++) {
+                    System.out.printf("%2d ", board[x][y]);
+                }
+                System.out.println();
+            }
+
+            // Print the total number of jumps
+            System.out.println("Total number of jumps: " + (N * N - 1));
+        }
+
+        sc.close();
+    }
+}
+
+
+
+
+..................................................................................................................................................................
+
+
+Assignment 6
+
+
+import java.util.Scanner;
+
+class a5 {
+    // A recursive utility function to solve Knight's Tour problem
+    static boolean explore(int x, int y, int count, int board[][], int xMove[], int yMove[], int N) {
+        int k, nx, ny;
+        if (count == N * N) // All squares are visited
+            return true;
+
+        // Try all next moves from the current coordinate (x, y)
+        for (k = 0; k < 8; k++) {
+            nx = x + xMove[k];
+            ny = y + yMove[k];
+            if (isSafe(nx, ny, board, N)) {
+                board[nx][ny] = count; // Mark the move
+                if (explore(nx, ny, count + 1, board, xMove, yMove, N)) // Recursive call
+                    return true;
+                else
+                    board[nx][ny] = -1; // Backtrack
+            }
+        }
+        return false;
+    }
+
+    // A utility function to check if x, y are valid indexes for N*N chessboard
+    static boolean isSafe(int x, int y, int board[][], int N) {
+        return (x >= 0 && x < N && y >= 0 && y < N && board[x][y] == -1);
+    }
+
+    public static void main(String args[]) {
+        Scanner sc = new Scanner(System.in);
+
+        // Enter size of the board
+        System.out.print("Enter value of N (board size): ");
+        int N = sc.nextInt();
+
+        // Validate board size
+        if (N <= 0) {
+            System.out.println("Invalid board size! N must be greater than 0.");
+            sc.close();
+            return;
+        }
+
+        // Enter starting coordinates of the knight
+        System.out.print("Enter starting coordinates (x y): ");
+        int sx = sc.nextInt();
+        int sy = sc.nextInt();
+
+        // Validate starting coordinates
+        if (sx < 0 || sx >= N || sy < 0 || sy >= N) {
+            System.out.println("Invalid starting coordinates! They must be within the board's range (0 to " + (N - 1) + ").");
+            sc.close();
+            return;
+        }
+
+        // NxN chessboard declared
+        int board[][] = new int[N][N];
+
+        // Initialization of board
+        for (int x = 0; x < N; x++)
+            for (int y = 0; y < N; y++)
+                board[x][y] = -1;
+
+        // xMove[] and yMove[] define the next moves of the knight
+        int xMove[] = {2, 1, -1, -2, -2, -1, 1, 2};
+        int yMove[] = {1, 2, 2, 1, -1, -2, -2, -1};
+
+        // Knight is initially at the starting position
+        board[sx][sy] = 0;
+
+        // Start exploring
+        if (!explore(sx, sy, 1, board, xMove, yMove, N)) {
+            System.out.println("Solution does not exist.");
+        } else {
+            System.out.println("Knight's Tour solution:");
+            for (int x = 0; x < N; x++) {
+                for (int y = 0; y < N; y++) {
+                    System.out.printf("%2d ", board[x][y]);
+                }
+                System.out.println();
+            }
+
+            // Print the total number of jumps
+            System.out.println("Total number of jumps: " + (N * N - 1));
+        }
+
+        sc.close();
+    }
+}
+
+
+
+....................................................................................................................................................................................
